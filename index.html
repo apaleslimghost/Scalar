@@ -143,18 +143,37 @@ canvas.addEventListener('mousedown', function(ev) {
 	}
 });
 
+function snap(ev) {
+	var x = ev.clientX;
+	var y = ev.clientY;
+
+	var line = lines[lines.length - 1];
+
+	if(ev.shiftKey) {
+		var angle = Math.atan2(x - line[0].x, y - line[0].y);
+		var hyp = d([line[0], {x:x, y:y}]);
+		var twentyTwoPointFive = Math.PI / 8;
+		var rounded = Math.round(angle / twentyTwoPointFive) * twentyTwoPointFive;
+		console.log(angle, hyp, rounded);
+
+		x = line[0].x + hyp * Math.sin(rounded);
+		y = line[0].y + hyp * Math.cos(rounded);
+	}
+
+	line[1].x = x;
+	line[1].y = y;
+}
+
 canvas.addEventListener('mousemove', function(ev) {
 	if(drawing) {
-		lines[lines.length - 1][1].x = ev.clientX;
-		lines[lines.length - 1][1].y = ev.clientY;
+		snap(ev);
 		renderMeasurements();
 	}
 });
 
 canvas.addEventListener('mouseup', function(ev) {
 	if(drawing) {
-		lines[lines.length - 1][1].x = ev.clientX;
-		lines[lines.length - 1][1].y = ev.clientY;
+		snap(ev);
 		drawing = false;
 		setBase(baseMeasure);
 	}

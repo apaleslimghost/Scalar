@@ -152,9 +152,8 @@ function snap(ev) {
 	if(ev.shiftKey) {
 		var angle = Math.atan2(x - line[0].x, y - line[0].y);
 		var hyp = d([line[0], {x:x, y:y}]);
-		var twentyTwoPointFive = Math.PI / 8;
+		var twentyTwoPointFive = Math.PI / 16;
 		var rounded = Math.round(angle / twentyTwoPointFive) * twentyTwoPointFive;
-		console.log(angle, hyp, rounded);
 
 		x = line[0].x + hyp * Math.sin(rounded);
 		y = line[0].y + hyp * Math.cos(rounded);

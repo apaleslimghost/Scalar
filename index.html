@@ -140,6 +140,7 @@ canvas.addEventListener('mousedown', function(ev) {
 	if(ev.which === 1) {
 		drawing = true;
 		lines.push([{x: ev.clientX, y: ev.clientY}, {x: ev.clientX, y: ev.clientY}]);
+		setBase(baseMeasure);
 	}
 });
 
@@ -166,6 +167,7 @@ function snap(ev) {
 canvas.addEventListener('mousemove', function(ev) {
 	if(drawing) {
 		snap(ev);
+		setBase(baseMeasure);
 		renderMeasurements();
 	}
 });
@@ -173,8 +175,9 @@ canvas.addEventListener('mousemove', function(ev) {
 canvas.addEventListener('mouseup', function(ev) {
 	if(drawing) {
 		snap(ev);
-		drawing = false;
 		setBase(baseMeasure);
+		renderMeasurements();
+		drawing = false;
 	}
 });
 </script>

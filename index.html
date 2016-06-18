@@ -59,12 +59,14 @@ var img = document.querySelector('img');
 var ctx = canvas.getContext('2d');
 
 var colors = [
-	'red',
-	'blue',
-	'green',
-	'yellow',
-	'cyan',
-	'magenta'
+	'#b1493f',
+	'#2e6e9e',
+	'#458b00',
+	'#d66d06',
+	'#2bbbbf',
+	'#92288f',
+	'#9e2f50',
+	'#a6a471',
 ];
 
 canvas.width = window.innerWidth;
@@ -118,7 +120,7 @@ function renderMeasurements() {
 }
 
 base.addEventListener('input', function(ev) {
-	setBase(parseFloat(ev.currentTarget.value));
+	setBase(parseFloat(ev.currentTarget.value) || 0);
 });
 
 loop(function() {

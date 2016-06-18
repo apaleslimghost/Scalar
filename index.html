@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Scalar</title>
+<style>
+body, html, canvas, #select, img {
+	margin: 0;
+	height: 100%;
+	width: 100%;
+	position: absolute;
+}
+
+#measurements {
+	position: absolute;
+}
+
+#select {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+img {
+	object-fit: contain;
+}
+
+.hide {
+	display: none;
+}
+
+canvas {
+	cursor: crosshair;
+}
+
+label input {
+	font: inherit;
+}
+</style>
+</head>
+<body>
+<form id="select"><input type="file"></form>
+<div id="next" class="hide">
+<img>
+<canvas id="canvas"></canvas>
+<div id="measurements">
+<input name="base" type="number">
+<span></span>
+</div>
+</div>
+<script>
+var canvas = document.querySelector('canvas');
+var input = document.querySelector('input[type=file]');
+var form = document.getElementById('select');
+var base = document.querySelector('[name=base]');
+var measurements = document.querySelector('#measurements span');
+var next = document.getElementById('next');
+var img = document.querySelector('img');
+var ctx = canvas.getContext('2d');
+
+var colors = [
+	'red',
+	'blue',
+	'green',
+	'yellow',
+	'cyan',
+	'magenta'
+];
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+input.addEventListener('change', function() {
+	form.classList.add('hide');
+	next.classList.remove('hide');
+	img.src = URL.createObjectURL(input.files[0]);
+});
+
+var lines = [];
+
+function loop(fn) {
+	requestAnimationFrame(function() {
+		fn();
+		loop(fn);
+	});
+}
+
+function d(l) {
+	return Math.sqrt(
+		Math.pow(l[0].x - l[1].x, 2) +
+		Math.pow(l[0].y - l[1].y, 2)
+	);
+}
+
+var baseMeasure = 0;
+var f = 0;
+
+function setBase(newBase) {
+	baseMeasure = newBase;
+	if(lines[0]) {
+		f = baseMeasure / d(lines[0]);
+		renderMeasurements();
+	}
+}
+
+function pl(n, s) {
+	return (s.length < n ? Array(n - s.length + 1).join(' ') : '') + s;
+}
+
+function pr(n, s) {
+	return s + (s.length < n ? Array(n - s.length + 1).join(' ') : '');
+}
+
+function renderMeasurements() {
+	measurements.innerHTML = lines.map(function(line, i) {
+		return `<pre style="color: ${colors[i]}">${pl(8, d(line).toFixed(1))}px = ${pr(8, (d(line) * f).toFixed(2))}</pre>`
+	}).join('');
+}
+
+base.addEventListener('input', function(ev) {
+	setBase(parseFloat(ev.currentTarget.value));
+});
+
+loop(function() {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.lineWidth = 2;
+	lines.forEach(function(line, i) {
+		ctx.strokeStyle = colors[i];
+		ctx.beginPath();
+		ctx.moveTo(line[0].x, line[0].y);
+		ctx.lineTo(line[1].x, line[1].y);
+		ctx.stroke();
+	});
+});
+
+var drawing = false;
+canvas.addEventListener('mousedown', function(ev) {
+	if(ev.which === 1) {
+		drawing = true;
+		lines.push([{x: ev.clientX, y: ev.clientY}, {x: ev.clientX, y: ev.clientY}]);
+	}
+});
+
+canvas.addEventListener('mousemove', function(ev) {
+	if(drawing) {
+		lines[lines.length - 1][1].x = ev.clientX;
+		lines[lines.length - 1][1].y = ev.clientY;
+		renderMeasurements();
+	}
+});
+
+canvas.addEventListener('mouseup', function(ev) {
+	if(drawing) {
+		lines[lines.length - 1][1].x = ev.clientX;
+		lines[lines.length - 1][1].y = ev.clientY;
+		drawing = false;
+		setBase(baseMeasure);
+	}
+});
+</script>
+
+</body>
+</html>
